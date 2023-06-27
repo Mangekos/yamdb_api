@@ -76,7 +76,7 @@ class SignUpUserViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         return Response(serializer.data, status.HTTP_200_OK)
 
 
-class UserMeApiView(APIView):
+class UsersMeApiView(APIView):
 
     permission_classes = [permissions.IsAuthenticated]
 
@@ -100,7 +100,7 @@ class UserMeApiView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetTokenApiViews(APIView):
+class GetTokenApiView(APIView):
 
     permission_classes = [permissions.AllowAny]
 
