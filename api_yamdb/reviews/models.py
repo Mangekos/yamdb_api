@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import CustomUser
 
 
 class Category(models.Model):
@@ -65,7 +66,7 @@ class Review(models.Model):
     )
     text = models.TextField()
     author = models.ForeignKey(
-        User,
+        CustomUser,
         models.CASCADE
     )
     score = models.IntegerField()
@@ -83,7 +84,7 @@ class Review(models.Model):
 class Comment(models.Model):
     text = models.TextField()
     author = models.ForeignKey(
-        User,
+        CustomUser,
         models.CASCADE
     )
     pub_date = models.DateTimeField(

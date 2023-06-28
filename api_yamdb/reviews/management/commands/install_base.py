@@ -1,7 +1,8 @@
 import csv
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from reviews.models import Category, Genre, GenreTitle, Title
+from reviews.models import (Category, Genre,
+                            GenreTitle, Title)
 
 
 DICT = {

@@ -14,12 +14,16 @@ from .permissions import (
 from .serializers import (
     CustomUserSerializer, SignUpSerializer, GetTokenSerializer
 )
-from rest_framework import viewsets, mixins
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 
-from reviews.models import Category, Genre, Title,
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer,
+from reviews.models import Category, Genre, Title
+from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
+
+from .serializers import ReviewSerializer, CommentSerializer
+from django.shortcuts import get_object_or_404
+from .permissions import AuthorOrReadOnly
+from reviews.models import Review, Title
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -164,13 +168,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     pagination_class = PageNumberPagination
     ordering_fields = ('name',)
-
-
-from rest_framework import viewsets
-from .serializers import ReviewSerializer, CommentSerializer
-from django.shortcuts import get_object_or_404
-from .permissions import AuthorOrReadOnly
-from reviews.models import Review, Title
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
