@@ -1,29 +1,21 @@
-from rest_framework import mixins, viewsets, filters
-from users.models import CustomUser
-from rest_framework import permissions, status
-from django.core.mail import EmailMessage
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.views import APIView
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.pagination import PageNumberPagination
-from .permissions import (
-    OnlyAdminPermissions
-)
-from .serializers import (
-    CustomUserSerializer, SignUpSerializer, GetTokenSerializer
-)
+from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from reviews.models import Category, Genre, Review, Title
+from users.models import CustomUser
 
-from reviews.models import Category, Genre, Title
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
-
-from .serializers import ReviewSerializer, CommentSerializer
-from django.shortcuts import get_object_or_404
-from .permissions import AuthorOrReadOnly
-from reviews.models import Review, Title
+from .permissions import OnlyAdminPermissions, ReadOnlyOrAuthorOrAdmin
+from .serializers import (CategorySerializer, CommentSerializer,
+                          CustomUserSerializer, GenreSerializer,
+                          GetTokenSerializer, ReviewSerializer,
+                          SignUpSerializer, TitleSerializer)
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -173,7 +165,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     """Вьюсет для отзывов."""
     serializer_class = ReviewSerializer
-    permission_classes = (AuthorOrReadOnly,)
+    permission_classes = (ReadOnlyOrAuthorOrAdmin,)
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -189,7 +181,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """Вьюсет для комментариев."""
     serializer_class = CommentSerializer
-    permission_classes = (AuthorOrReadOnly,)
+    permission_classes = (ReadOnlyOrAuthorOrAdmin,)
 
     def get_queryset(self):
         review_id = self.kwargs.get("review_id")

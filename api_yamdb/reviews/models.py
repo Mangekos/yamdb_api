@@ -30,16 +30,18 @@ class Title(models.Model):
     description = models.TextField(blank=True)
     genre = models.ForeignKey(
         Genre,
-        related_name='titles'
+        related_name='titles',
+        on_delete=models.CASCADE
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
+        null=True,
         related_name='titles'
     )
 
     class Meta:
-        ordeting = ('name',)
+        ordering = ('name',)
 
     def __str__(self):
         return {self.name}
@@ -74,8 +76,8 @@ class Review(models.Model):
         auto_now_add=True,
     )
 
-    class Meta:
-        orderind = ('pub_date',)
+    # class Meta:
+    #     orderind = ('pub_date',)
 
     def __str__(self):
         return {self.text}

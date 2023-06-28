@@ -1,13 +1,11 @@
 
-from rest_framework import serializers
-from reviews.models import Comment, Review, Title
-from rest_framework.validators import UniqueTogetherValidator
+from django.contrib.auth.validators import ASCIIUsernameValidator
+from django.core.validators import validate_email
 from django.db.models import Avg
 from django.forms import ValidationError
 from rest_framework import serializers
-from django.core.validators import validate_email
-from django.contrib.auth.validators import ASCIIUsernameValidator
-from reviews.models import Category, Genre, Title
+from rest_framework.validators import UniqueTogetherValidator
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import CustomUser
 
 
