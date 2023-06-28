@@ -3,15 +3,17 @@ from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
-from .permissions import OnlyAdminPermissions, ReadOnlyOrAuthorOrAdmin
+from .permissions import (OnlyAdminPermissions, ReadOnlyOrAuthorOrAdmin,
+                          IsAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           CustomUserSerializer, GenreSerializer,
                           GetTokenSerializer, ReviewSerializer,
@@ -143,6 +145,8 @@ class CategoryGenreViewSet(CreateDestroyListViewSet):
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
+    permission_classes = (IsAdminOrReadOnly,
+                          ReadOnlyOrAuthorOrAdmin)
 
 
 class CategoryViewSet(CategoryGenreViewSet):
@@ -160,12 +164,17 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     pagination_class = PageNumberPagination
     ordering_fields = ('name',)
+    permission_classes = (IsAdminOrReadOnly,
+                          ReadOnlyOrAuthorOrAdmin)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Вьюсет для отзывов."""
     serializer_class = ReviewSerializer
-    permission_classes = (ReadOnlyOrAuthorOrAdmin,)
+    permission_classes = (ReadOnlyOrAuthorOrAdmin,
+                          IsAuthenticatedOrReadOnly)
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
