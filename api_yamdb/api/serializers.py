@@ -1,8 +1,9 @@
+
 from django.forms import ValidationError
 from rest_framework import serializers
 from django.core.validators import validate_email
 from django.contrib.auth.validators import ASCIIUsernameValidator
-
+from reviews.models import Category, Genre, Title
 from users.models import CustomUser
 
 
@@ -71,3 +72,25 @@ class GetTokenSerializer(serializers.Serializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'confirmation_code']
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('name', 'slug')
+        model = Category
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('name', 'slug')
+        model = Genre
+
+
+class TitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        model = Title
+
