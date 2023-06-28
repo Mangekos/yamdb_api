@@ -17,7 +17,8 @@ from .permissions import (OnlyAdminPermissions, ReadOnlyOrAuthorOrAdmin,
 from .serializers import (CategorySerializer, CommentSerializer,
                           CustomUserSerializer, GenreSerializer,
                           GetTokenSerializer, ReviewSerializer,
-                          SignUpSerializer, TitleSerializer)
+                          SignUpSerializer, TitleSerializer,
+                          TitleCreateSerializer)
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -168,6 +169,11 @@ class TitleViewSet(viewsets.ModelViewSet):
                           ReadOnlyOrAuthorOrAdmin)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
 
+    def get_serializer_class(self):
+        if self.action == 'create' or self.action == 'partial_update':
+            return TitleCreateSerializer
+        return TitleSerializer
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Вьюсет для отзывов."""
@@ -190,7 +196,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """Вьюсет для комментариев."""
     serializer_class = CommentSerializer
-    permission_classes = (ReadOnlyOrAuthorOrAdmin,)
+    pagination_class = PageNumberPagination
+    permission_classes = (ReadOnlyOrAuthorOrAdmin,
+                          IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
         review_id = self.kwargs.get("review_id")

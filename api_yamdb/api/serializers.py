@@ -46,28 +46,6 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('review', )
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    """Обработка произведений."""
-    rating = serializers.SerializerMethodField()
-
-    def get_rating(self, title):
-        rating = Review.objects.filter(
-            title=title).aggregate(Avg('score'))['score__avg']
-        if rating:
-            return int(rating)
-        return None
-
-    class Meta:
-        fields = ('id',
-                  'name',
-                  'year',
-                  'description',
-                  'genre',
-                  'category',
-                  'rating')
-        model = Title
-
-
 class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -150,7 +128,41 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    genre = GenreSerializer(many=True)
+    rating = serializers.IntegerField()
 
     class Meta:
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        model = Title
+        read_only_fields = '__all__'
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField()
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
+    genre = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Genre.objects.all(),
+        many=True
+    )
+
+    def get_rating(self, title):
+        rating = Review.objects.filter(
+            title=title).aggregate(Avg('score'))['score__avg']
+        if rating:
+            return int(rating)
+        return None
+
+    class Meta:
+        fields = ('id',
+                  'name',
+                  'year',
+                  'description',
+                  'genre',
+                  'category',
+                  'rating')
         model = Title
