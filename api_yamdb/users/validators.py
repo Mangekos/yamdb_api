@@ -1,7 +1,12 @@
 from django.core.exceptions import ValidationError
+import re
+
+REGEX_FOR_USERNAME = re.compile(r'^[\w.@+-]+')
 
 
-def validate_name(value):
-    if value == 'me':
-        raise ValidationError('Нельзя использовать "me" в качестве username')
-    return value
+def validate_name(name):
+    if name == 'me':
+        raise ValidationError('Имя пользователя "me" использовать нельзя!')
+    if not REGEX_FOR_USERNAME.fullmatch(name):
+        raise ValidationError(
+            'Можно использовать только буквы, цифры и "@.+-_".')

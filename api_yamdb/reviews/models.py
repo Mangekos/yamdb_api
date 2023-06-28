@@ -1,11 +1,11 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-
-from users.models import CustomUser
+from django.db.models import UniqueConstraint
+from api_yamdb.settings import AUTH_USER_MODEL
 
 
 class Category(models.Model):
-    name = models.TextField()
+    name = models.TextField(max_length=256)
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
@@ -31,7 +31,7 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    name = models.TextField()
+    name = models.TextField(max_length=256)
     year = models.IntegerField()
     description = models.TextField(blank=True)
     genre = models.ManyToManyField(
@@ -78,7 +78,7 @@ class Review(models.Model):
     )
     text = models.TextField()
     author = models.ForeignKey(
-        CustomUser,
+        AUTH_USER_MODEL,
         models.CASCADE
     )
     score = models.IntegerField(
@@ -88,17 +88,23 @@ class Review(models.Model):
         auto_now_add=True,
     )
 
-    # class Meta:
-    #     orderind = ('pub_date',)
+    class Meta:
+        ordering = ('-pub_date',)
+        constraints = [
+            UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_author_rewiev'
+            )
+        ]
 
     def __str__(self):
-        return {self.text}
+        return self.text
 
 
 class Comment(models.Model):
     text = models.TextField()
     author = models.ForeignKey(
-        CustomUser,
+        AUTH_USER_MODEL,
         models.CASCADE
     )
     pub_date = models.DateTimeField(
