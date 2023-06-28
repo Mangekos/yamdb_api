@@ -1,7 +1,4 @@
 
-from django.contrib.auth.validators import ASCIIUsernameValidator
-from django.core.validators import validate_email
-from django.forms import ValidationError
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import CustomUser
@@ -77,50 +74,18 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return data
 
 
-class SignUpSerializer(serializers.Serializer):
+class SignUpSerializer(serializers.ModelSerializer):
     """Сериализатор для эндпоинта регистрации пользователей."""
-    username = serializers.CharField(max_length=150)
-    email = serializers.CharField(max_length=254)
 
-    def validate_email(self, value):
-        """Проверяем валидность email."""
-        try:
-            validate_email(value)
-        except ValidationError:
-            raise serializers.ValidationError('Некорректное поле email.')
-        return value
-
-    def validate_username(self, value):
-        """Проверяем валидность username."""
-        if value == 'me':
-            raise serializers.ValidationError(
-                'Использование username -me- запрещено.'
-            )
-        try:
-            ASCIIUsernameValidator(value)
-        except ValidationError:
-            raise serializers.ValidationError('Некорректное поле username.')
-        return value
-
-    def validate(self, data):
-        """Проверяем наличие username и корректность email."""
-        if CustomUser.objects.filter(username=data['username']).exists():
-            if (
-                    CustomUser.objects.get(username=data['username']).email
-            ) == data['email']:
-                return data
-            raise serializers.ValidationError('Неверный e-mail.')
-        return data
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'username')
 
 
 class GetTokenSerializer(serializers.Serializer):
 
     username = serializers.CharField(max_length=256)
     confirmation_code = serializers.CharField(max_length=256)
-
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'confirmation_code']
 
 
 class CategorySerializer(serializers.ModelSerializer):

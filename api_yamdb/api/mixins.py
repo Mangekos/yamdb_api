@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, viewsets, filters
+from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import PageNumberPagination
 
 from .permissions import IsAdminOrReadOnly

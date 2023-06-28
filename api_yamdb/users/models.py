@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+from api_yamdb.settings import CONFIRMATION_CODE_LENGTH
+
 from .validators import validate_name
 
 
@@ -51,23 +53,43 @@ class UserRole:
 
 class CustomUser(AbstractBaseUser):
     """Описываем кастомную модель пользователя."""
-    email = models.EmailField(unique=True, max_length=254,
-                              verbose_name='email')
-    username = models.CharField(unique=True,
-                                validators=[validate_name],
-                                max_length=150,
-                                verbose_name='имя пользователя')
-    date_joined = models.DateTimeField(verbose_name='дата создания',
-                                       auto_now_add=True)
-    last_login = models.DateTimeField(verbose_name='последний вход в систему',
-                                      auto_now=True)
-    is_admin = models.BooleanField(default=False,
-                                   verbose_name='Администратор')
-    is_active = models.BooleanField(default=True,
-                                    verbose_name='активный')
+    email = models.EmailField(
+        unique=True,
+        max_length=254,
+        verbose_name='email'
+    )
+    username = models.CharField(
+        unique=True,
+        validators=[validate_name],
+        max_length=150,
+        verbose_name='имя пользователя'
+    )
+    date_joined = models.DateTimeField(
+        verbose_name='дата создания',
+        auto_now_add=True
+    )
+    confirmation_code = models.CharField(
+        blank=True,
+        verbose_name='Код для авторизации',
+        max_length=CONFIRMATION_CODE_LENGTH,
+    )
+    last_login = models.DateTimeField(
+        verbose_name='последний вход в систему',
+        auto_now=True
+    )
+    is_admin = models.BooleanField(
+        default=False,
+        verbose_name='Администратор'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='активный'
+    )
     is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False,
-                                       verbose_name='Суперпользователь')
+    is_superuser = models.BooleanField(
+        default=False,
+        verbose_name='Суперпользователь'
+    )
 
     ROLE_CHOICES = (
         (UserRole.USER, 'Аутентифицированный пользователь'),

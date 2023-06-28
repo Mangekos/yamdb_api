@@ -132,3 +132,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+
+MIN_SCORE_VALUE = 1
+MAX_SCORE_VALUE = 10
+
+ADMIN_EMAIL = 'admin@yamdb.com'
+CONFIRMATION_CODE_LENGTH = 16
+NOT_ALLOWED_USERNAME = 'me'
