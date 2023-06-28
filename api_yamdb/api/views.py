@@ -1,4 +1,3 @@
-
 from rest_framework import mixins, viewsets, filters
 from users.models import CustomUser
 from rest_framework import permissions, status
@@ -21,7 +20,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from reviews.models import Category, Genre, Title,
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer,
-                    
+
 
 class CustomUserViewSet(viewsets.ModelViewSet):
 
@@ -134,7 +133,7 @@ class GetTokenApiView(APIView):
         data = {"token": str(access_token)}
         return Response(data, status=status.HTTP_200_OK)
 
-        
+
 class CreateDestroyListViewSet(
         mixins.CreateModelMixin,
         mixins.ListModelMixin,
@@ -165,3 +164,42 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     pagination_class = PageNumberPagination
     ordering_fields = ('name',)
+
+
+from rest_framework import viewsets
+from .serializers import ReviewSerializer, CommentSerializer
+from django.shortcuts import get_object_or_404
+from .permissions import AuthorOrReadOnly
+from reviews.models import Review, Title
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    """Вьюсет для отзывов."""
+    serializer_class = ReviewSerializer
+    permission_classes = (AuthorOrReadOnly,)
+
+    def get_queryset(self):
+        title_id = self.kwargs.get("title_id")
+        new_queryset = get_object_or_404(Title, id=title_id)
+        return new_queryset.reviews.all()
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get("title_id")
+        title = get_object_or_404(Title, id=title_id)
+        serializer.save(author=self.request.user, title=title)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для комментариев."""
+    serializer_class = CommentSerializer
+    permission_classes = (AuthorOrReadOnly,)
+
+    def get_queryset(self):
+        review_id = self.kwargs.get("review_id")
+        new_queryset = get_object_or_404(Review, id=review_id)
+        return new_queryset.comments.all()
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs.get("review_id")
+        review = get_object_or_404(Review, id=review_id)
+        serializer.save(author=self.request.user, review=review)
