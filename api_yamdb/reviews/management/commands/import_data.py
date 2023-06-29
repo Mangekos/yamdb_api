@@ -35,7 +35,7 @@ def category_import():
 
 def genre_import():
     if Genre.objects.exists():
-        print('Данные для Category уже загружены')
+        print('Данные для Genre уже загружены')
     else:
         with open(
             f'{settings.BASE_DIR}/static/data/genre.csv',
@@ -52,7 +52,7 @@ def genre_import():
 
 def genre_title_import():
     if GenreTitle.objects.exists():
-        print('Данные для Category уже загружены')
+        print('Данные для GenreTitle уже загружены')
     else:
         with open(
             f'{settings.BASE_DIR}/static/data/genre_title.csv',
