@@ -37,6 +37,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,),
     )
     def me(self, request):
+        """Обработка метода PATCH."""
         if request.method == 'PATCH':
             serializer = CustomUserSerializer(
                 request.user, data=request.data, partial=True
@@ -54,6 +55,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 @api_view(('POST',))
 @permission_classes((permissions.AllowAny,))
 def signup(request):
+    """Функция проверки входа."""
     username = request.data.get('username')
     if CustomUser.objects.filter(username=username).exists():
         user = get_object_or_404(CustomUser, username=username)
@@ -113,6 +115,7 @@ class UsersMeApiView(views.APIView):
 @api_view(('POST',))
 @permission_classes((permissions.AllowAny,))
 def get_token(request):
+    """Функция для токена."""
     serializer = GetTokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(CustomUser, username=request.data['username'])
@@ -127,16 +130,19 @@ def get_token(request):
 
 
 class CategoryViewSet(CreateDestroyListViewSet):
+    """Вьюсет для категорий."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
 class GenreViewSet(CreateDestroyListViewSet):
+    """Вьюсет для жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для произведений."""
     queryset = Title.objects.all().annotate(Avg('reviews__score'))
     serializer_class = TitleSerializer
     pagination_class = pagination.PageNumberPagination

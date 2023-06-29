@@ -83,12 +83,14 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 class GetTokenSerializer(serializers.Serializer):
+    """Сериализатор для токена."""
 
     username = serializers.CharField(max_length=256)
     confirmation_code = serializers.CharField(max_length=256)
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для категорий."""
 
     class Meta:
         fields = ('name', 'slug')
@@ -96,6 +98,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор для жанров."""
 
     class Meta:
         fields = ('name', 'slug')
@@ -103,6 +106,8 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор для произведений."""
+
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
     rating = serializers.IntegerField(source='reviews__score__avg',
@@ -117,6 +122,8 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class TitleCreateSerializer(TitleSerializer):
+    """Сериализатор для создания произведений."""
+
     category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all()
