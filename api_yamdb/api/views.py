@@ -36,20 +36,20 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         detail=False,
         permission_classes=(permissions.IsAuthenticated,),
     )
-    def change_role(self, request):
-        """Изменение роли."""
-        if request.method == 'PATCH':
-            serializer = CustomUserSerializer(
-                request.user, data=request.data, partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save(role=request.user.role)
-            return response.Response(
-                serializer.data,
-                status=status.HTTP_200_OK
-            )
-        serializer = CustomUserSerializer(request.user)
-        return response.Response(serializer.data, status=status.HTTP_200_OK)
+    def me(self, request):
+        """Получение данных о себе"""
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user)
+            return response.Response(serializer.data)
+
+        serializer = self.get_serializer(
+            request.user, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        if serializer.validated_data.get('role'):
+            serializer.validated_data['role'] = request.user.role
+        serializer.save()
+        return response.Response(serializer.data)
 
 
 @api_view(('POST',))
@@ -57,21 +57,14 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 def signup(request):
     """Функция проверки входа."""
     username = request.data.get('username')
-    if CustomUser.objects.filter(username=username).exists():
+    email = request.data.get('email')
+    if CustomUser.objects.filter(username=username, email=email).exists():
         user = get_object_or_404(CustomUser, username=username)
         serializer = SignUpSerializer(
             user, data=request.data, partial=True
         )
-        serializer.is_valid(raise_exception=True)
-        if serializer.validated_data['email'] != user.email:
-            return response.Response(
-                'Почта указана неверно!', status=status.HTTP_400_BAD_REQUEST
-            )
-        serializer.save(raise_exception=True)
-        send_confirmation_code_to_email(username)
-        return response.Response(serializer.data, status=status.HTTP_200_OK)
-
-    serializer = SignUpSerializer(data=request.data)
+    else:
+        serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     send_confirmation_code_to_email(username)
