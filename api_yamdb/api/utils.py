@@ -11,7 +11,8 @@ def send_confirmation_code_to_email(username):
     """Функция для отправки кода."""
     user = get_object_or_404(CustomUser, username=username)
     confirmation_code = int(
-        ''.join([str(random.randrange(0, 10))
+        ''.join([str(random.randrange(settings.MIN_SCORE_VALUE,
+                                      settings.MAX_SCORE_VALUE))
                  for _ in range(settings.CONFIRMATION_CODE_LENGTH)])
     )
     user.confirmation_code = confirmation_code
