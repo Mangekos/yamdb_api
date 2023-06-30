@@ -18,3 +18,8 @@ def title_year_validator(value):
         return value
     raise ValidationError(
         'Год выпуска не может быть больше текущего!')
+
+
+def email_validator(value):
+    """Проверка почты."""
+    pass

@@ -36,8 +36,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         detail=False,
         permission_classes=(permissions.IsAuthenticated,),
     )
-    def me(self, request):
-        """Обработка метода PATCH."""
+    def change_role(self, request):
+        """Изменение роли."""
         if request.method == 'PATCH':
             serializer = CustomUserSerializer(
                 request.user, data=request.data, partial=True
@@ -73,17 +73,9 @@ def signup(request):
 
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    if serializer.validated_data['username'] != 'me':
-        serializer.save()
-        send_confirmation_code_to_email(username)
-        return response.Response(serializer.data, status=status.HTTP_200_OK)
-    return response.Response(
-        (
-            'Использование имени пользователя '
-            '-me- запрещено!'
-        ),
-        status=status.HTTP_400_BAD_REQUEST
-    )
+    serializer.save()
+    send_confirmation_code_to_email(username)
+    return response.Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UsersMeApiView(views.APIView):

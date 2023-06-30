@@ -1,8 +1,7 @@
-
 from rest_framework import serializers
+
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import CustomUser
-
 from .validators import title_year_validator
 
 
@@ -54,14 +53,14 @@ class CommentSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для кастомной модели пользователя."""
     class Meta:
-        fields = [
+        fields = (
             'username',
             'email',
             'first_name',
             'last_name',
             'bio',
             'role'
-        ]
+        )
         model = CustomUser
 
     def validate(self, data):
