@@ -1,16 +1,30 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import UniqueConstraint
+from api.validators import validate_slug
 from api_yamdb.settings import AUTH_USER_MODEL
 
 
-class Category(models.Model):
-    """Модель для категорий."""
+class CustomBaseModel(models.Model):
+    """Кастомная модель для повторяющихся полей.
+    Модели -Категория- и -Жанр-."""
     name = models.TextField(max_length=256, verbose_name='Имя')
-    slug = models.SlugField(max_length=50, unique=True, verbose_name='Слаг')
+    slug = models.SlugField(
+        max_length=50,
+        unique=True,
+        validators=[validate_slug],
+        verbose_name='Слаг'
+    )
 
     class Meta:
+        abstract = True
         ordering = ('name',)
+
+
+class Category(CustomBaseModel):
+    """Модель для категорий."""
+
+    class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -18,13 +32,11 @@ class Category(models.Model):
         return f'{self.name}'
 
 
-class Genre(models.Model):
+class Genre(CustomBaseModel):
     """Модель для жанров."""
-    name = models.CharField(max_length=256, verbose_name='Имя')
-    slug = models.SlugField(max_length=50, unique=True, verbose_name='Слаг')
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('slug',)
         verbose_name = 'Жанры'
         verbose_name_plural = 'Жанры'
 

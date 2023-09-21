@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
 from api_yamdb.settings import CONFIRMATION_CODE_LENGTH
-
 from .validators import validate_name
 
 
@@ -97,18 +96,26 @@ class CustomUser(AbstractBaseUser):
         (UserRole.ADMIN, 'Администратор')
     )
     role = models.CharField(choices=ROLE_CHOICES,
-                            default='user', max_length=64,
+                            default='user', max_length=128,
                             verbose_name='role',)
+
     bio = models.TextField(blank=True, verbose_name='о себе')
     first_name = models.CharField(max_length=150, blank=True,
                                   verbose_name='имя')
     last_name = models.CharField(max_length=150, blank=True,
                                  verbose_name='фамилия')
+    password = models.CharField(verbose_name='пароль',
+                                max_length=128,
+                                blank=True, null=True)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
     objects = CustomUserManager()
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователь'
 
     @property
     def is_user(self):
@@ -121,13 +128,13 @@ class CustomUser(AbstractBaseUser):
         return self.role == UserRole.ADMIN or self.is_superuser
 
     @property
-    def is_admin_or_moderator(self):
+    def is_moderator(self):
         """Описываем свойства для пермишенов."""
-        return (self.role in (UserRole.ADMIN, UserRole.MODERATOR)
+        return (self.role == UserRole.MODERATOR
                 or self.is_superuser)
 
     def __str__(self):
-        return self.username
+        return f'{self.username}'
 
     def has_perm(self, perm, obj=None):
         return self.is_admin

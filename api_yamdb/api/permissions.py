@@ -4,7 +4,7 @@ from rest_framework import permissions
 class OnlyAdminPermission(permissions.BasePermission):
     """Доступ разрешен только администраторам."""
 
-    message = 'Доступ к данной операции разрешен только администраторам.'
+    message = 'Доступно только для Администратора.'
 
     def has_permission(self, request, view):
         return (request.user.is_authenticated
@@ -16,7 +16,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     Редактирование объекта доступно только для Администратора.
     Для чтения доступно всем.
     """
-    message = 'Доступно только для Администратора'
+    message = 'Доступно только для Администратора.'
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -39,6 +39,7 @@ class ReadOnlyOrAuthorOrAdmin(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         if (request.user.is_authenticated
-                and request.user.is_admin_or_moderator):
+                and request.user.is_moderator
+                or request.user.is_admin_or_superuser):
             return True
         return request.user.is_authenticated and request.user == obj.author
